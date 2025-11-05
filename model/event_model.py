@@ -1,7 +1,7 @@
 from datetime import datetime
 from data.scoring import SERIOUSNESS
 import re
-
+from data.scoring import user_seriousness  # live user adjustments
 
 class Event:
     def __init__(self, data):
@@ -42,6 +42,11 @@ class Event:
     @property
     def seriousness(self):
         return SERIOUSNESS.get(self.type.strip(), 0) if self.type else 0
+    
+    @property
+    def effective_seriousness(self):
+        
+        return user_seriousness.get(self.type.strip(), self.seriousness)
 
     def __str__(self):
         """

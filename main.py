@@ -3,8 +3,7 @@ from functions.time_filter import filter_recent_events, format_datetime, get_tim
 from data.api_fetch import fetch_events
 from model.event_model import Event
 from functions.search import search_events, search_input
-
-# ----------------------------
+from data.scoring import user_seriousness# ----------------------------
 # Hämta events och sortera
 # ----------------------------
 
@@ -32,15 +31,19 @@ def show_all_events():
 from datetime import datetime, timedelta
 
 def get_serious_events(hours=None, min_score=7):
-    """Return a filtered list of serious events (for Flask, GUI, etc.)."""
+    """Return a filtered list of serious events that respects user settings."""
     events = load_events()
-    serious_events = [e for e in events if e.seriousness >= min_score]
 
+    def effective_score(e):
+        return user_seriousness.get(e.type, e.seriousness)
+
+    # Filter by seriousness level
+    serious_events = [e for e in events if effective_score(e) >= min_score]
+
+    # Filter by time window, if specified
     if hours is not None:
         cutoff = datetime.now() - timedelta(hours=hours)
-        serious_events = [
-            e for e in serious_events if e.time and e.time >= cutoff
-        ]
+        serious_events = [e for e in serious_events if e.time and e.time >= cutoff]
 
     return serious_events
 
@@ -169,3 +172,4 @@ def meny():
 if __name__ == "__main__":
     # Only run the menu if executed directly, not when imported by Flask
     meny()
+

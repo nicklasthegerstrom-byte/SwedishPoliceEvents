@@ -9,7 +9,7 @@ SERIOUSNESS = {
     "Arbetsplatsolycka": 4,
     "Bedrägeri": 3,
     "Bombhot": 8,
-    "Brand": 8,
+    "Brand": 6,
     "Brand automatlarm": 5,
     "Bråk": 2,
     "Detonation": 8,
