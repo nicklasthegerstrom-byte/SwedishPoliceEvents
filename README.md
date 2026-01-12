@@ -22,26 +22,25 @@ Användaren kan välja tidsintervall, söka efter nyckelord (t.ex. "mord", "skot
 
 
    
-GUI Layout (Planned)
-
-Top Frame – Filters
-
-Time Filter Buttons: 3h | 6h | 12h | 24h | All
-
-Refresh Button: to manually check for new events
-
-Middle Frame – Search
-
-Keyword Search: input box + search button
-
-Location Search: input box + search button
-
-Main Frame – Event Display
-
-Scrollable Text widget or Listbox to show events
-
-Each event formatted nicely like in your terminal version
-
-Bottom Frame – Exit
-
-Quit button
+polisprojekt/
+│
+├── webapp.py                # Flask-huvudfilen – startar servern, hanterar routes (/, /manage, /check_new_events)
+│
+├── notify_flask.py          # Håller koll på nya händelser, "seen_event_ids", filtrerar allvarliga händelser
+│
+├── main.py                  # Hjälpfunktioner: load_events(), get_serious_events(), search_events_by_word(), osv.
+│
+├── templates/               # Flask HTML-mallar
+│   ├── index.html           # Huvudsidan med filter, sökfält, notisknapp och händelselista
+│   └── manage.html          # Sida för att ändra allvarlighetsgrader (seriousness)
+│
+├── static/                  # Statisk data som CSS, JS, bilder
+│   ├── style.css            # (Frivilligt) utbruten CSS om du inte vill ha den inline
+│   └── script.js            # (Frivilligt) JavaScript för notiser, auto-refresh, m.m.
+│
+├── data/                    # (Valfritt) Lagring av hämtade händelser, cache, JSON, eller framtida databas
+│   └── events.json
+│
+├── requirements.txt         # Lista på Python-paket (Flask m.fl.)
+│
+└── README.md                # Kort beskrivning, instruktioner, ev. TODO-lista
