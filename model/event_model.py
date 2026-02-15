@@ -1,63 +1,61 @@
 from datetime import datetime
-from data.scoring import SERIOUSNESS
-import re
-from data.scoring import user_seriousness  # live user adjustments
+from dataclasses import dataclass
+from zoneinfo import ZoneInfo
+from typing import Any
 
+@dataclass
 class Event:
-    def __init__(self, data):
-        self.id = data.get("id")
-        self.datetime_str = data.get("datetime")
-        self.type = data.get("type", "Okänd typ")
-        self.summary = data.get("summary", "Ingen beskrivning")
-        self.location = data.get("location", {})
-        self.url = data.get("url")
+    id: int | None
+    datetime_str: str | None
+    type: str
+    summary: str
+    location: dict[str, Any]
+    url: str | None
+    raw_type: str | None = None  # <-- spårning
 
-       
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> "Event":
+        raw_type = data.get("type")
+        type_norm = (raw_type or "").strip() or "Okänd typ"
+
+        return cls(
+            id=data.get("id"),
+            datetime_str=data.get("datetime"),
+            type=type_norm,
+            summary=(data.get("summary") or "Ingen beskrivning"),
+            location=(data.get("location") or {}),
+            url=data.get("url"),
+            raw_type=raw_type,
+        )
+
     @property
-    def time(self):
-        """Return a parsed datetime object, fixing single-digit hours and ignoring timezone."""
+    def time(self) -> datetime | None:
         if not self.datetime_str:
             return None
 
         try:
-            # Remove timezone if present (e.g., '+02:00')
-            dt_str = self.datetime_str.split(" ")[0] + " " + self.datetime_str.split(" ")[1]
-
-            # Fix single-digit hours: add leading zero if needed
-            # Matches patterns like "9:08:15" and turns into "09:08:15"
-            dt_str = re.sub(r"^(\d{4}-\d{2}-\d{2}) (\d):", r"\1 0\2:", dt_str)
-
-            return datetime.fromisoformat(dt_str)
-        except Exception:
-            print(f"⚠️ Could not parse datetime: {self.datetime_str}")
+            dt = datetime.fromisoformat(self.datetime_str.strip())
+            return dt.astimezone(ZoneInfo("Europe/Stockholm"))
+        except ValueError:
             return None
 
-
-
-
     @property
-    def location_name(self):
+    def location_name(self) -> str:
         return self.location.get("name", "Okänd plats")
 
+
     @property
-    def seriousness(self):
-        return SERIOUSNESS.get(self.type.strip(), 0) if self.type else 0
-    
-    @property
-    def effective_seriousness(self):
-        
-        return user_seriousness.get(self.type.strip(), self.seriousness)
+    def full_url(self) -> str | None:
+        return f"https://polisen.se{self.url}" if self.url else None
 
     def __str__(self):
-        """
-        Nicely formatted string for printing.
-        Always prints datetime without timezone.
-        """
-        time_str = self.time.strftime("%Y-%m-%d %H:%M") if self.time else "Okänd tid"
+        t = self.time  # hämta en gång
+        time_str = t.strftime("%Y-%m-%d %H:%M") if t else "Okänd tid"
+
         return (
             f"🕒 Tid: {time_str}\n"
             f"📍 Plats: {self.location_name}\n"
             f"🚨 Händelse: {self.type}\n"
             f"📝 Sammanfattning: {self.summary}\n"
-            f"🔗 URL: {self.url or 'Ingen länk'}"
+            f"🔗 URL: {self.full_url or 'Ingen länk'}"
         )

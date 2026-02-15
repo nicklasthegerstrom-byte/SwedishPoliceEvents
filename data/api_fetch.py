@@ -1,6 +1,6 @@
 import time
 from typing import Any
-
+from model.event_model import Event
 import requests
 
 DEFAULT_URL = "https://polisen.se/api/events"
@@ -51,13 +51,13 @@ def fetch_events(
 
 
 
-def print_events():
-
+def print_events(n: int = 2):
     events = fetch_events()
     if events is None:
-    # handle failure
         return
-    print(events[0])
 
-print_events()
+    for raw in events[:n]:
+        print(Event.from_api(raw))
+        print()
 
+print_events(2)
