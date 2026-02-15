@@ -47,3 +47,17 @@ def fetch_events(
                 time.sleep(backoff_seconds * attempt)
             else:
                 return None
+            
+
+
+
+def print_events():
+
+    events = fetch_events()
+    if events is None:
+    # handle failure
+        return
+    print(events[0])
+
+print_events()
+
