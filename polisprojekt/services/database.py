@@ -56,33 +56,26 @@ class EventDB:
 
             con.commit()
 
-    def save_event(self, e: Event, raw: dict[str, Any]) -> bool:
-        """
-        Spara event i events-tabellen.
-        Returnerar True om eventet var nytt (sparades), annars False.
-        """
-        if e.id is None:
+    def save_event(self, e: Event) -> bool:
+        if e.event_id is None:
             return False
 
         fetched_at = datetime.now(timezone.utc).isoformat()
 
-        # plocka gps från raw (du ville spara den)
         gps = None
-        loc = raw.get("location")
+        loc = e.raw.get("location")
         if isinstance(loc, dict):
-            gps_val = loc.get("gps")
-            if isinstance(gps_val, str):
-                gps = gps_val
+            gps = loc.get("gps")
 
-        raw_json = json.dumps(raw, ensure_ascii=False)
+        raw_json = json.dumps(e.raw, ensure_ascii=False)
 
         with self._connect() as con:
             cur = con.execute("""
                 INSERT OR IGNORE INTO events
-                (id, datetime, type, summary, name, city, county, gps, url, fetched_at, raw_json)
+                (event_id, datetime, type, summary, name, city, county, gps, url, fetched_at, raw_json)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                e.id,
+                e.event_id,
                 e.datetime_str,
                 e.type,
                 e.summary,
