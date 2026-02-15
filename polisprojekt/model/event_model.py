@@ -5,7 +5,7 @@ from typing import Any
 
 @dataclass
 class Event:
-    id: int | None
+    event_id: int | None
     datetime_str: str | None
     type: str
     summary: str
@@ -13,6 +13,7 @@ class Event:
     location: dict[str, Any]
     url: str | None
     raw_type: str | None = None  # <-- spårning
+    raw: dict[str, Any]
 
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> "Event":
@@ -20,7 +21,7 @@ class Event:
         type_norm = (raw_type or "").strip() or "Okänd typ"
 
         return cls(
-            id=data.get("id"),
+            event_id=data.get("id"),
             datetime_str=data.get("datetime"),
             type=type_norm,
             summary=(data.get("summary") or "Ingen beskrivning"),
@@ -28,6 +29,7 @@ class Event:
             location=(data.get("location") or {}),
             url=data.get("url"),
             raw_type=raw_type,
+            raw=data
         )
 
     @property

@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from functions.time_filter import filter_recent_events, format_datetime, get_time_only
+from services.time_filter import filter_recent_events, format_datetime, get_time_only
 from data.api_fetch import fetch_events
 from model.event_model import Event
-from functions.search import search_events, search_input
+from services.search import search_events, search_input
 from data.scoring import user_seriousness# ----------------------------
 # Hämta events och sortera
 # ----------------------------

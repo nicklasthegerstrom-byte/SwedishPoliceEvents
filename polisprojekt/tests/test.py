@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from data.api_fetch import fetch_events
 from model.event_model import Event
-from functions.search import search_events, search_input
+from services.search import search_events, search_input
 
 
 def load_events():
