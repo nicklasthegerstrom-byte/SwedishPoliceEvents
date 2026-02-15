@@ -13,6 +13,7 @@ class Event:
     location: dict[str, Any]
     url: str | None
     raw_type: str | None = None  # <-- spårning
+    raw: dict[str, Any]
 
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> "Event":
@@ -28,6 +29,7 @@ class Event:
             location=(data.get("location") or {}),
             url=data.get("url"),
             raw_type=raw_type,
+            raw=data
         )
 
     @property
