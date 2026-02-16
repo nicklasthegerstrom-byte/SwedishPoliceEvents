@@ -168,7 +168,7 @@ def meny():
 from polisprojekt.data.api_fetch import fetch_events
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
-
+from polisprojekt.services.sorting import get_serious_events
 
 def run_once():
     db = EventDB()
@@ -180,6 +180,7 @@ def run_once():
 
     events: list[Event] = []
     inserted = 0
+    
 
     for item in api_data:
         e = Event.from_api(item)
@@ -194,8 +195,11 @@ def run_once():
     latest_event = max(timed_events, key=lambda e: e.time) if timed_events else None
 
     total = len(events)
+    serious = get_serious_events(events, min_score=7)
+
 
     print(f"Fetched: {total}")
+    print("Serious:", len(serious))
     print(f"Inserted new: {inserted}")
     print(f"Already existed: {total - inserted}")
 
@@ -205,6 +209,11 @@ def run_once():
     else:
         print("\nLatest event: kunde inte parsea någon tid.")
 
+    print(f"Serious events: {len(serious)}\n")
+
+    for e in serious:
+        print(e)
+        print("-" * 40)
 
 if __name__ == "__main__":
     run_once()

@@ -72,16 +72,18 @@ class Event:
         city = self.city
         county = self.county
 
-        if city and county:
-            place_line = f"📍 {city} ({county})"
+        if city and county and city != county:
+            place = f"{city} ({county})"
         elif county:
-            place_line = f"📍 {county}"
+            place = county
+        elif city:
+            place = city
         else:
-            place_line = "📍 Okänd plats"
+            place = "Okänd plats"
 
         return (
             f"🕒 Tid: {time_str}\n"
-            f"{place_line}\n"
+            f"{place}\n"
             f"🚨 Händelse: {self.type}\n"
             f"📝 Sammanfattning: {self.summary}\n"
             f"🔗 URL: {self.full_url or 'Ingen länk'}"
@@ -93,14 +95,14 @@ class Event:
         city = self.city
         county = self.county
 
-        if city and county:
-            place_line = f"📍 {city} ({county})"
-        elif city:
-            place_line = f"📍 {city}"
+        if city and county and city != county:
+            place = f"{city} ({county})"
         elif county:
-            place_line = f"📍 {county}"
+            place = county
+        elif city:
+            place = city
         else:
-            place_line = "📍 Okänd plats"
+            place = "Okänd plats"
 
         url = self.full_url
         link_part = f"🔗 <{url}|Läs mer>" if url else ""
@@ -108,7 +110,7 @@ class Event:
         return (
             f"🚨 *{self.type}*\n"
             f"🕒 {time_str}\n"
-            f"{place_line}\n"
+            f"{place}\n"
             f"📝 {self.summary}\n"
             f"{link_part}"
         )
