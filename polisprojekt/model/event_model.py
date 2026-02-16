@@ -83,7 +83,7 @@ class Event:
 
         return (
             f"🕒 Tid: {time_str}\n"
-            f"{place}\n"
+            f"📍 {place}\n"
             f"🚨 Händelse: {self.type}\n"
             f"📝 Sammanfattning: {self.summary}\n"
             f"🔗 URL: {self.full_url or 'Ingen länk'}"
@@ -110,7 +110,7 @@ class Event:
         return (
             f"🚨 *{self.type}*\n"
             f"🕒 {time_str}\n"
-            f"{place}\n"
+            f"📍 {place}\n"
             f"📝 {self.summary}\n"
             f"{link_part}"
         )
