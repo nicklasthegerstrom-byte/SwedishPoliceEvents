@@ -205,13 +205,16 @@ def run_once():
 
     if latest_event:
         print("\nLatest event (from API):")
+        print()
         print(latest_event)
     else:
         print("\nLatest event: kunde inte parsea någon tid.")
 
     print(f"Serious events: {len(serious)}\n")
-
-    for e in serious:
+    seriousno = 10
+    print(f"\n{seriousno} latest serious events:")
+    print()
+    for e in serious[:seriousno]:
         print(e)
         print("-" * 40)
 
