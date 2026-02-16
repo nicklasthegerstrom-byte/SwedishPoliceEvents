@@ -27,6 +27,7 @@ SERIOUSNESS = {
     "Inbrott, försök": 4,
     "Knivlagen": 4,
     "Kontroll person/fordon": 2,
+    "Kontroll": 1,
     "Lagen om hundar och katter": 1,
     "Larm inbrott": 2,
     "Larm överfall": 5,

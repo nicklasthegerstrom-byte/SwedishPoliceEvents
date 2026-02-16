@@ -12,8 +12,7 @@ DB_DIR.mkdir(exist_ok=True)
 ARCHIVE_DIR = DB_DIR / "archive"
 ARCHIVE_DIR.mkdir(exist_ok=True)
 
-def events_db_path_for(dt: datetime | None = None) -> Path:
-    """Rätt db-fil för året: events_YYYY.db"""
+def active_events_db_path(dt: datetime | None = None) -> Path:
     if dt is None:
         dt = datetime.now(TZ)
-    return ARCHIVE_DIR / f"events_{dt.year}.db"
+    return DB_DIR / f"events_{dt.year}.db"
