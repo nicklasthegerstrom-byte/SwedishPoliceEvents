@@ -83,7 +83,34 @@ class EventDB:
             ))
             con.commit()
             return cur.rowcount == 1
+        
+    def is_notified(self, event_id: int) -> bool:
+        """True om event_id redan finns i notified-tabellen."""
+        if event_id is None:
+            return False
 
+        with self._connect() as con:
+            row = con.execute(
+                "SELECT 1 FROM notified WHERE event_id = ?",
+                (event_id,),
+            ).fetchone()
+            return row is not None    
+        
+    def mark_notified(self, event_id: int) -> None:
+        """Sparar att eventet har notifierats (ska kallas EFTER lyckad Slack-post)."""
+        if event_id is None:
+            return
+
+        now = datetime.now(timezone.utc).isoformat()
+
+        with self._connect() as con:
+            con.execute(
+                "INSERT OR IGNORE INTO notified (event_id, notified_at) VALUES (?, ?)",
+                (event_id, now),
+            )
+            con.commit()   
+
+        #OBS JAG BEHÖVER INTE DENNA JUST NU TA BORT SEN
     def mark_notified_if_new(self, event_id: int) -> bool:
         """
         Markera att vi notifierat eventet.
@@ -99,4 +126,6 @@ class EventDB:
             )
             con.commit()
             return cur.rowcount == 1
+        
+    
         
