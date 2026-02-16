@@ -2,6 +2,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 from typing import Any
+from polisprojekt.data.scoring import SERIOUSNESS
 
 @dataclass
 class Event:
@@ -54,7 +55,11 @@ class Event:
     @property
     def county(self) -> str | None:
         return self.location.get("name")
-
+    
+    @property
+    def seriousness(self) -> int:
+        # okänd typ ska inte råka bli 0 och filtreras bort
+        return SERIOUSNESS.get(self.type.strip(), 9)
 
     @property
     def full_url(self) -> str | None:
