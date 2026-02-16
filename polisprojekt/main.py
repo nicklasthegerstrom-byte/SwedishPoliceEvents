@@ -1,9 +1,4 @@
-from datetime import datetime, timedelta
-from services.time_filter import filter_recent_events, format_datetime, get_time_only
-from data.api_fetch import fetch_events
-from model.event_model import Event
-from services.search import search_events, search_input
-from data.scoring import user_seriousness# ----------------------------
+
 # Hämta events och sortera
 # ----------------------------
 
@@ -168,8 +163,48 @@ def meny():
             else:
                 print("Skriv J för Ja eller N för Nej.")
 
+#NY VERSION AV MAIN HÄR:
+
+from polisprojekt.data.api_fetch import fetch_events
+from polisprojekt.model.event_model import Event
+from polisprojekt.services.database import EventDB
+
+
+def run_once():
+    db = EventDB()
+
+    api_data = fetch_events()
+    if not api_data:
+        print("No data from API.")
+        return
+
+    events: list[Event] = []
+    inserted = 0
+
+    for item in api_data:
+        e = Event.from_api(item)
+        events.append(e)
+
+        if db.save_event(e):
+            inserted += 1
+
+    # plocka bara de som har en tid
+    timed_events = [e for e in events if e.time is not None]
+
+    latest_event = max(timed_events, key=lambda e: e.time) if timed_events else None
+
+    total = len(events)
+
+    print(f"Fetched: {total}")
+    print(f"Inserted new: {inserted}")
+    print(f"Already existed: {total - inserted}")
+
+    if latest_event:
+        print("\nLatest event (from API):")
+        print(latest_event)
+    else:
+        print("\nLatest event: kunde inte parsea någon tid.")
+
 
 if __name__ == "__main__":
-    # Only run the menu if executed directly, not when imported by Flask
-    meny()
-
+    run_once()
