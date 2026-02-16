@@ -21,7 +21,7 @@ class EventDB:
         return con
 
     def _ensure_schema(self) -> None:
-        """Ensure required tables exist (idempotent)."""
+        """Ensure required tables exist."""
         with self._connect() as con:
             # 1) events-tabell (historik)
             con.execute("""
@@ -99,3 +99,4 @@ class EventDB:
             )
             con.commit()
             return cur.rowcount == 1
+        
