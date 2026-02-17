@@ -3,7 +3,6 @@ import requests
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
 
-#Notify används inte just nu pga görs direkt i pipeline
 def notify_slack(
     db: EventDB,
     events: list[Event],
@@ -58,7 +57,7 @@ def notify_discord(
         if db.is_notified(e.event_id):
             continue
 
-        ok = send_to_discord(webhook_url, e.to_slack())
+        ok = send_to_discord(webhook_url, e.to_discord())
 
         if ok:
             db.mark_notified(e.event_id)
