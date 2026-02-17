@@ -5,6 +5,7 @@ from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
 
 from polisprojekt.services.sorting import get_serious_events
+from datetime import datetime
 
 def load_events() -> list[Event]:
     api_data = fetch_events()
@@ -105,6 +106,11 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str,
             inserted += 1
 
     serious = get_serious_events(events, min_score=min_score)
+    
+    serious = sorted(
+    serious,
+    key=lambda e: e.time or datetime.min
+)
 
     sent = 0
     for e in serious:
