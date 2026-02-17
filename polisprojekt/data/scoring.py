@@ -22,6 +22,8 @@ SERIOUSNESS = {
     "Förfalskningsbrott": 1,
     "Försvunnen person": 8,
     "Gränskontroll": 1,
+    "Hets mot folkgrupp": 4,
+    "Hemfridsbrott": 7,
     "Häleri": 1,
     "Inbrott": 4,
     "Inbrott, försök": 4,
