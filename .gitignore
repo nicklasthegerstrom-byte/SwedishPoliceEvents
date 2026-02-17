@@ -18,3 +18,7 @@ venv/
 
 #database
 db/
+
+.env
+*.db
+__pycache__/

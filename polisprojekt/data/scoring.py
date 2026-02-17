@@ -76,6 +76,7 @@ SERIOUSNESS = {
     "Stöld, försök": 2,
     "Stöld, ringa": 2,
     "Stöld/inbrott": 2,
+    "Smällar": 7,
     "Tillfälligt obemannat": 0,
     "Trafikbrott": 2,
     "Trafikhinder": 1,
@@ -92,7 +93,8 @@ SERIOUSNESS = {
     "Våld/hot mot tjänsteman": 5,
     "Våldtäkt": 5,
     "Våldtäkt, försök": 5,
-    "Vållande till kroppsskada": 7
+    "Vållande till kroppsskada": 7,
+    "Övrigt": 0,
 }
 
 user_seriousness = {
