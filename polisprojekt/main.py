@@ -171,9 +171,15 @@ from polisprojekt.services.database import EventDB
 from polisprojekt.services.sorting import get_serious_events
 from polisprojekt.config import active_events_db_path
 
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
+from polisprojekt.config import DISCORD_WEBHOOK
 
+if not DISCORD_WEBHOOK:
+    raise ValueError("DISCORD_WEBHOOK saknas. Lägg den i .env")
 
 def run_once():
 
@@ -226,5 +232,13 @@ def run_once():
         print(e)
         print("-" * 40)
 
+
+
+from polisprojekt.services.notify import send_to_discord
+
+def test_discord():
+    ok = send_to_discord(DISCORD_WEBHOOK, "Test: polisprojekt → Discord webhook ✅")
+    print("Discord OK:", ok)
+
 if __name__ == "__main__":
-    run_once()
+    test_discord()

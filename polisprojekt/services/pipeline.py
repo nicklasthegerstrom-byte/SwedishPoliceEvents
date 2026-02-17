@@ -1,5 +1,5 @@
 from __future__ import annotations
-from polisprojekt.services.notify_slack import send_to_slack
+from polisprojekt.services.notify import send_to_slack, send_to_discord
 from polisprojekt.data.api_fetch import fetch_events
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
