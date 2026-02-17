@@ -120,3 +120,33 @@ class Event:
             f"📝 {self.summary}\n"
             f"{link_part}"
         )
+    
+    def to_discord(self) -> str:
+        t = self.time
+        time_str = t.strftime("%Y-%m-%d %H:%M") if t else "Okänd tid"
+
+        city = self.city
+        county = self.county
+
+        warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP\n\n" if self.type not in SERIOUSNESS else ""
+
+        if city and county and city != county:
+            place = f"{city} ({county})"
+        elif county:
+            place = county
+        elif city:
+            place = city
+        else:
+            place = "Okänd plats"
+
+        url = self.full_url
+        link_part = f"\n🔗 {url}" if url else ""
+
+        return (
+            f"{warning}"
+            f"🚨 **{self.type}**\n"
+            f"🕒 {time_str}\n"
+            f"📍 {place}\n"
+            f"📝 {self.summary}"
+            f"{link_part}"
+        )
