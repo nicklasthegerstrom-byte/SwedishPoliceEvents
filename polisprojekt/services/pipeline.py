@@ -1,5 +1,5 @@
 from __future__ import annotations
-from polisprojekt.services.notify import send_to_slack, send_to_discord
+from polisprojekt.services.notify import notify_discord
 from polisprojekt.data.api_fetch import fetch_events
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
@@ -27,9 +27,7 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str,
     1) Hämtar events från API
     2) Sparar alla i DB (historik)
     3) Filtrerar ut "serious"
-    4) Skickar till Discord endast om eventet INTE notifierats tidigare
-    5) Markerar som notifierat först efter lyckad post
-
+    4) Skickar till Discord via notify_discord (dedupe + mark_notified ingår där)
     Returnerar enkel statistik.
     """
     api_data = fetch_events()
@@ -44,24 +42,14 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str,
             inserted += 1
 
     serious = get_serious_events(events, min_score=min_score)
-    
-    serious = sorted(
-    serious,
-    key=lambda e: e.time or datetime.min
-)
+    serious = sorted(serious, key=lambda e: e.time or datetime.min)
 
-    sent = 0
-    for e in serious:
-        if e.event_id is None:
-            continue
-
-        if db.is_notified(e.event_id):
-            continue
-
-        ok = send_to_discord(webhook, e.to_discord())
-        if ok:
-            db.mark_notified(e.event_id)
-            sent += 1
+    sent = notify_discord(
+        db=db,
+        events=serious,
+        webhook_url=webhook,
+        min_score=min_score,
+    )
 
     return {
         "fetched": len(events),
