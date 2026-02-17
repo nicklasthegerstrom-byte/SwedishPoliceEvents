@@ -169,10 +169,18 @@ from polisprojekt.data.api_fetch import fetch_events
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
 from polisprojekt.services.sorting import get_serious_events
+from polisprojekt.config import active_events_db_path
+
+
+
+
 
 def run_once():
-    db = EventDB()
 
+   
+    db_path = active_events_db_path()
+    db = EventDB(str(db_path))
+    
     api_data = fetch_events()
     if not api_data:
         print("No data from API.")
@@ -197,7 +205,7 @@ def run_once():
     total = len(events)
     serious = get_serious_events(events, min_score=7)
 
-
+    print("Using DB:", db_path)
     print(f"Fetched: {total}")
     print("Serious:", len(serious))
     print(f"Inserted new: {inserted}")

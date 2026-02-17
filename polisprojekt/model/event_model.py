@@ -95,6 +95,11 @@ class Event:
         city = self.city
         county = self.county
 
+        if self.type not in SERIOUSNESS:
+            warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP:\n"
+        else:
+            warning = ""
+
         if city and county and city != county:
             place = f"{city} ({county})"
         elif county:
@@ -108,6 +113,7 @@ class Event:
         link_part = f"🔗 <{url}|Läs mer>" if url else ""
 
         return (
+            f"{warning}"
             f"🚨 *{self.type}*\n"
             f"🕒 {time_str}\n"
             f"📍 {place}\n"

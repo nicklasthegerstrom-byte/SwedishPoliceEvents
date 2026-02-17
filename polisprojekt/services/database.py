@@ -11,23 +11,17 @@ from polisprojekt.model.event_model import Event
 
 
 class EventDB:
-    """
-    Minimal SQLite-store:
-    - events: historik (en rad per event-id)
-    - notified: vilka event vi redan postat till Slack
-    """
-
-    def __init__(self, db_path: Path | None = None) -> None:
-        # Default: database ligger i projektroten
-        self.db_path = db_path or (PROJECT_ROOT / "database.db")
-        self._init_db()
+    def __init__(self, db_path: str):
+        self.db_path = db_path
+        self._ensure_schema()
 
     def _connect(self) -> sqlite3.Connection:
-        # Skapar parent-dir om du skulle peka db_path mot en undermapp
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        return sqlite3.connect(self.db_path, timeout=10)
+        con = sqlite3.connect(self.db_path)
+        con.row_factory = sqlite3.Row
+        return con
 
-    def _init_db(self) -> None:
+    def _ensure_schema(self) -> None:
+        """Ensure required tables exist."""
         with self._connect() as con:
             # 1) events-tabell (historik)
             con.execute("""
@@ -89,7 +83,34 @@ class EventDB:
             ))
             con.commit()
             return cur.rowcount == 1
+        
+    def is_notified(self, event_id: int) -> bool:
+        """True om event_id redan finns i notified-tabellen."""
+        if event_id is None:
+            return False
 
+        with self._connect() as con:
+            row = con.execute(
+                "SELECT 1 FROM notified WHERE event_id = ?",
+                (event_id,),
+            ).fetchone()
+            return row is not None    
+        
+    def mark_notified(self, event_id: int) -> None:
+        """Sparar att eventet har notifierats (ska kallas EFTER lyckad Slack-post)."""
+        if event_id is None:
+            return
+
+        now = datetime.now(timezone.utc).isoformat()
+
+        with self._connect() as con:
+            con.execute(
+                "INSERT OR IGNORE INTO notified (event_id, notified_at) VALUES (?, ?)",
+                (event_id, now),
+            )
+            con.commit()   
+
+        #OBS JAG BEHÖVER INTE DENNA JUST NU TA BORT SEN
     def mark_notified_if_new(self, event_id: int) -> bool:
         """
         Markera att vi notifierat eventet.
@@ -105,3 +126,6 @@ class EventDB:
             )
             con.commit()
             return cur.rowcount == 1
+        
+    
+        
