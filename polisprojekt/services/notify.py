@@ -21,3 +21,19 @@ def send_to_slack(webhook_url: str, text: str, timeout: int = 10) -> bool:
     except requests.RequestException as e:
         print(f"Slack error: {e}")
         return False
+
+def send_to_discord(webhook_url: str, text: str, timeout: int = 10) -> bool:
+    """
+    Skickar text till Discord via webhook.
+    Returnerar True om Discord svarar OK (2xx), annars False.
+    """
+    try:
+        resp = requests.post(
+            webhook_url,
+            json={"content": text},
+            timeout=timeout,
+        )
+        resp.raise_for_status()
+        return True
+    except requests.RequestException:
+        return False
