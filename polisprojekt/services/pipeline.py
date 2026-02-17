@@ -120,7 +120,7 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str,
         if db.is_notified(e.event_id):
             continue
 
-        ok = send_to_discord(webhook, e.to_slack())
+        ok = send_to_discord(webhook, e.to_discord())
         if ok:
             db.mark_notified(e.event_id)
             sent += 1
