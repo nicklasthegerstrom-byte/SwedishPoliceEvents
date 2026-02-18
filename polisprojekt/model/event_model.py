@@ -34,6 +34,10 @@ class Event:
         )
 
     @property
+    def type_key(self) -> str:
+        return (self.type or "").strip()
+
+    @property
     def time(self) -> datetime | None:
         if not self.datetime_str:
             return None
@@ -58,8 +62,7 @@ class Event:
     
     @property
     def seriousness(self) -> int:
-        # okänd typ ska inte råka bli 0 och filtreras bort
-        return SERIOUSNESS.get(self.type.strip(), 9)
+        return SERIOUSNESS.get(self.type_key, 9)
 
     @property
     def full_url(self) -> str | None:
@@ -95,7 +98,7 @@ class Event:
         city = self.city
         county = self.county
 
-        if self.type not in SERIOUSNESS:
+        if self.type_key not in SERIOUSNESS:
             warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP:\n"
         else:
             warning = ""
@@ -128,7 +131,7 @@ class Event:
         city = self.city
         county = self.county
 
-        warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP\n\n" if self.type not in SERIOUSNESS else ""
+        warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP\n\n" if self.type_key not in SERIOUSNESS else ""
 
         if city and county and city != county:
             place = f"{city} ({county})"
