@@ -21,6 +21,11 @@ DB_DIR.mkdir(exist_ok=True)
 ARCHIVE_DIR = DB_DIR / "archive"
 ARCHIVE_DIR.mkdir(exist_ok=True)
 
+LOG_DIR = PROJECT_ROOT / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOG_FILE_PATH = LOG_DIR / "polisprojekt.log"
+
 
 def active_events_db_path(dt: datetime | None = None) -> Path:
     if dt is None:
