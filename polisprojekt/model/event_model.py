@@ -6,6 +6,7 @@ from polisprojekt.data.scoring import SERIOUSNESS
 import logging
 
 logger = logging.getLogger(__name__)
+TZ = ZoneInfo("Europe/Stockholm")
 
 @dataclass
 class Event:
@@ -42,14 +43,22 @@ class Event:
 
     @property
     def time(self) -> datetime | None:
-        if not self.datetime_str:
+        s = (self.datetime_str or "").strip()
+        if not s:
             return None
 
+        # 1) Försök: funkar på "2026-02-15 07:45:43+01:00" eller "2026-02-15T07:45:43+01:00"
         try:
-            dt = datetime.fromisoformat(self.datetime_str.strip())
-            return dt.astimezone(ZoneInfo("Europe/Stockholm"))
+            return datetime.fromisoformat(s).astimezone(TZ)
         except ValueError:
-            logger.warning(f"Fel tidsformat!")
+            pass
+
+        # 2) Fallback: Polisen-formatet "YYYY-MM-DD H:MM:SS +01:00" (med mellanslag och 1-siffrig timme)
+        try:
+            dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S %z")
+            return dt.astimezone(TZ)
+        except ValueError:
+            logger.warning("Fel tidsformat: %r (event_id=%s)", self.datetime_str, self.event_id)
             return None
         
     @property
