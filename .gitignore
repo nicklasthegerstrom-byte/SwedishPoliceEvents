@@ -22,3 +22,6 @@ db/
 .env
 *.db
 __pycache__/
+
+logs/
+/logs/*
