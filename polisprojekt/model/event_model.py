@@ -49,6 +49,7 @@ class Event:
             dt = datetime.fromisoformat(self.datetime_str.strip())
             return dt.astimezone(ZoneInfo("Europe/Stockholm"))
         except ValueError:
+            logger.warning(f"Fel tidsformat!")
             return None
         
     @property
@@ -114,6 +115,7 @@ class Event:
         elif city:
             place = city
         else:
+            logger.warning(f"Ingen plats angiven.")
             place = "Okänd plats"
 
         url = self.full_url
@@ -148,6 +150,7 @@ class Event:
         elif city:
             place = city
         else:
+            logger.warning(f"Ingen plats angiven.")
             place = "Okänd plats"
 
         url = self.full_url

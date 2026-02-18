@@ -3,6 +3,9 @@ import requests
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
 
+import logging
+logger = logging.getLogger(__name__)
+
 def notify_slack(
     db: EventDB,
     events: list[Event],
@@ -31,8 +34,11 @@ def notify_slack(
         ok = send_to_slack(webhook_url, e.to_slack())
 
         if ok:
+            logger.info(f"Notifierade event {e.event_id} ({e.type})")
             db.mark_notified(e.event_id)
             sent_count += 1
+        else:
+            logger.error(f"Misslyckades notifiera event {e.event_id} ({e.type})")
 
     return sent_count
 
@@ -60,17 +66,18 @@ def notify_discord(
         ok = send_to_discord(webhook_url, e.to_discord())
 
         if ok:
+            logger.info(f"Notifierade event {e.event_id} ({e.type})")
             db.mark_notified(e.event_id)
             sent_count += 1
+        else:
+            logger.error(f"Misslyckades notifiera event {e.event_id} ({e.type})")
 
     return sent_count
 
 def send_to_slack(webhook_url: str, text: str, timeout: int = 10) -> bool:
-    """
-    Skickar text till Slack via incoming webhook.
-    Returnerar True om Slack svarar OK, annars False.
-    """
     try:
+        logger.info("Försöker skicka meddelande till Slack")
+
         response = requests.post(
             webhook_url,
             json={"text": text},
@@ -79,25 +86,34 @@ def send_to_slack(webhook_url: str, text: str, timeout: int = 10) -> bool:
 
         response.raise_for_status()
 
-        # Slack brukar returnera "ok"
-        return response.text.strip().lower() == "ok"
+        ok = response.text.strip().lower() == "ok"
+
+        if ok:
+            logger.info("Slack-notis skickad OK")
+        else:
+            logger.error(f"Slack svarade oväntat: {response.text}")
+
+        return ok
 
     except requests.RequestException as e:
-        print(f"Slack error: {e}")
+        logger.error(f"Slack error: {e}")
         return False
 
 def send_to_discord(webhook_url: str, text: str, timeout: int = 10) -> bool:
-    """
-    Skickar text till Discord via webhook.
-    Returnerar True om Discord svarar OK (2xx), annars False.
-    """
     try:
+        logger.info("Försöker skicka meddelande till Discord")
+
         resp = requests.post(
             webhook_url,
             json={"content": text},
             timeout=timeout,
         )
+
         resp.raise_for_status()
+
+        logger.info("Discord-notis skickad OK")
         return True
-    except requests.RequestException:
+
+    except requests.RequestException as e:
+        logger.error(f"Discord error: {e}")
         return False
