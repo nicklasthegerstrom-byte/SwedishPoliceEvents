@@ -1,112 +1,128 @@
-Nicks Polishändelser 1.0
+# Nick's Police Monitor 2.0
 
-Ett webbverktyg för att övervaka svenska polishändelser i realtid, filtrera dem efter allvarlighetsgrad, plats, tid och sökord – och få notiser när nya allvarliga händelser inträffar.
+A headless newsroom monitoring system for Swedish police incidents.
 
-Byggd i Python med Flask, för redaktionell användning och snabba nyhetsbeslut.
+Built in Python to run 24/7, store historical data, filter by severity,
+and send notifications when new serious incidents occur.
 
-⸻
+Designed for editorial decision-making under real-world conditions.
 
-VAD GÖR APPEN
+---
 
-Applikationen hämtar data från Polismyndighetens öppna API och låter dig:
-	•	Se alla aktuella polishändelser
-	•	Filtrera på:
-	•	Tid (3h, 6h, 12h, 24h eller alla)
-	•	Allvarlighetsgrad (1–10)
-	•	Sökord (t.ex. mord, explosion)
-	•	Plats (stad, ort, område)
-	•	Justera hur allvarliga olika händelsetyper anses vara
-	•	Få notiser när nya allvarliga händelser dyker upp
+## What It Does
 
-Det är i praktiken ett litet redaktionellt övervakningssystem för blåljusflödet.
+The system continuously fetches incident data from the Swedish Police public API and:
 
-⸻
+- Stores all events in a local SQLite database
+- Assigns each event type a seriousness score (1–10)
+- Filters events based on configurable minimum severity
+- Sends notifications (Discord / Slack) for new serious events
+- Avoids duplicate notifications via a notified-events table
+- Logs errors and unknown event types
+- Runs safely in an infinite loop without crashing
 
-PROJEKTSTRUKTUR
+This is essentially a lightweight editorial surveillance engine for real-time blue-light news.
 
-polisprojekt
-webapp.py – Flask-servern (huvudapp)
-main.py – Affärslogik: laddning, filtrering, sökning
-notify_flask.py – Håller koll på nya allvarliga händelser
+---
 
-data
-scoring.py – Grundallvarlighet + användarjusteringar
+## Core Design Principles
 
-templates
-index.html – Webbgränssnittet
-manage.html – Sida för att ändra allvarlighetsgrader
+- Never crash the loop
+- Never send duplicate notifications
+- Fail safe rather than fail silent
+- Log unexpected behavior
+- Keep the system observable and debuggable
 
-static
-style.css – Färger, layout, UI
-script.js – Notiser och frontendlogik
+---
 
-requirements.txt
-README.md
+## Architecture Overview
 
-⸻
+polisprojekt/
+- main.py               → Infinite loop entry point
+- config.py             → Environment variables and paths
+- services/
+    - pipeline.py       → Orchestrates fetch → filter → notify
+    - notify.py         → Slack / Discord logic + dedupe
+    - database.py       → SQLite persistence + notified table
+    - logger.py         → Rotating file logging
+    - sorting.py        → Serious event filtering
+- data/
+    - api_fetch.py      → API calls + retry/backoff logic
+    - scoring.py        → Event severity mapping
+- model/
+    - event_model.py    → Event model + formatting
+- tests/                → Pytest-based test suite
 
-STARTA APPEN LOKALT
-	1.	Skapa virtuell miljö (valfritt men rekommenderat)
+Database:
+- SQLite
+- events table (history)
+- notified table (deduplication)
 
-python -m venv venv
-source venv/bin/activate
-	2.	Installera beroenden
+Logging:
+- Rotating file handler
+- Daily log rotation
+- Error + anomaly visibility
 
-pip install -r requirements.txt
-	3.	Starta servern
+---
 
-python webapp.py
-	4.	Öppna i webbläsare
+## Severity Model
 
-http://127.0.0.1:5000
+Each event type is mapped to a seriousness score (1–10).
 
-⸻
+Examples:
+- Murder: 10
+- Explosion: 9
+- Shooting: 9
+- Robbery: 7
+- Minor disturbance: 3
 
-ALLVARLIGHETSGRAD
+Unknown event types:
+- Receive a high default score (fail-safe design)
+- Are logged for review
 
-Varje händelsetyp har ett allvarlighetsvärde mellan 1 och 10.
+---
 
-Exempel:
-Mord: 10
-Explosion: 9
-Rån: 7
-Brand: 6
-Ofredande: 3
+## Reliability Features
 
-Du kan ändra dessa i webbgränssnittet under sidan
-/manage
+- Request timeout handling
+- Retry logic with backoff
+- Graceful handling of:
+  - Network errors
+  - HTTP errors
+  - Invalid JSON responses
+- Loop-level exception safety
+- Persistent deduplication of notifications
 
-Detta påverkar alla filter och notiser.
+The system is designed to survive unstable networks and API irregularities.
 
-⸻
+---
 
-NOTISER
+## Testing
 
-Appen kan upptäcka när nya allvarliga händelser tillkommer.
+The project includes pytest-based tests covering:
 
-Systemet:
-	•	Minns vilka event som redan setts
-	•	När nya dyker upp med seriousness över vald gräns skickas notis till webbläsaren
+- Network failures
+- HTTP errors
+- Invalid JSON
+- Retry behavior
+- Notification success/failure handling
+- Deduplication logic
+- Severity filtering
 
-Detta sker via en endpoint som frontend frågar regelbundet.
+---
 
-⸻
+## Intended Use
 
-FÖR PRODUKTION
+This tool is built for newsroom environments where:
 
-Detta är en Flask-utvecklingsserver.
+- Time matters
+- Noise must be filtered
+- Serious events must not be missed
+- Automation supports editorial judgment
 
-För att köra publikt:
-	•	Kör via Render, Fly.io eller Railway
-	•	Använd Gunicorn eller annan WSGI-server
+It is not a web app.
+It is an autonomous monitoring service.
 
-⸻
+---
 
-VARFÖR DETTA FINNS
-
-Det är ett redaktionellt verktyg för att:
-	•	Snabbt se vad polisen arbetar med i Sverige
-	•	Prioritera händelser
-	•	Sortera bort mindre intressanta händelser
-
-Byggt för människor (Främst mig själv) som måste fatta nyhetsbeslut på minuter.
+Built for real-world editorial workflows.
