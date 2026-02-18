@@ -3,6 +3,9 @@ from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 from typing import Any
 from polisprojekt.data.scoring import SERIOUSNESS
+import logging
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Event:
@@ -99,6 +102,7 @@ class Event:
         county = self.county
 
         if self.type_key not in SERIOUSNESS:
+            logger.warning(f"Ograderad händelsetyp upptäckt: {self.type}")
             warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP:\n"
         else:
             warning = ""
@@ -131,7 +135,11 @@ class Event:
         city = self.city
         county = self.county
 
-        warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP\n\n" if self.type_key not in SERIOUSNESS else ""
+        if self.type_key not in SERIOUSNESS:
+            logger.warning(f"Ograderad händelsetyp upptäckt: {self.type}")
+            warning = "⚠️ OBS! OGRADERAD HÄNDELSETYP:\n"
+        else:
+            warning = ""
 
         if city and county and city != county:
             place = f"{city} ({county})"

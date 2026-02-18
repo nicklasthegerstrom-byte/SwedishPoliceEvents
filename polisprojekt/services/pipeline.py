@@ -7,19 +7,8 @@ from polisprojekt.services.database import EventDB
 from polisprojekt.services.sorting import get_serious_events
 from datetime import datetime
 
-def load_events() -> list[Event]:
-    api_data = fetch_events()
-    if not api_data:
-        return []
-    return [Event.from_api(item) for item in api_data]
-
-
-def save_events(db: EventDB, events: list[Event]) -> int:
-    inserted = 0
-    for e in events:
-        if db.save_event(e):
-            inserted += 1
-    return inserted
+import logging
+logger = logging.getLogger(__name__)
 
 
 def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str, int]:
@@ -32,6 +21,7 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str,
     """
     api_data = fetch_events()
     if not api_data:
+        logger.warning("API levererade ingen data.")
         return {"fetched": 0, "inserted": 0, "serious": 0, "sent": 0}
 
     events = [Event.from_api(item) for item in api_data]
