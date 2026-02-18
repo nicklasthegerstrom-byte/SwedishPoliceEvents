@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def run_once_discord(db: EventDB, webhook: str, min_score: int = 7) -> dict[str, int]:
+def run_once_discord(db: EventDB, webhook: str, min_score: int = 6) -> dict[str, int]:
     """
     1) Hämtar events från API
     2) Sparar alla i DB (historik)
