@@ -5,7 +5,7 @@ from polisprojekt.config import LOG_FILE_PATH
 
 def setup_logger() -> logging.Logger:
     logger = logging.getLogger("polisprojekt")
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
 
     # Undvik dubbla handlers om du råkar kalla setup två gånger
     if logger.handlers:
