@@ -6,7 +6,7 @@ SERIOUSNESS = {
     "Alkohollagen": 1,
     "Anträffad död": 10,
     "Anträffat gods": 1,
-    "Arbetsplatsolycka": 4,
+    "Arbetsplatsolycka": 6,
     "Bedrägeri": 3,
     "Bombhot": 8,
     "Brand": 6,

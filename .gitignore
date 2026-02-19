@@ -23,5 +23,9 @@ db/
 *.db
 __pycache__/
 
+
+
+db/
 logs/
-/logs/*
+.env
+*.db
