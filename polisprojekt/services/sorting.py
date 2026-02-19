@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Iterable
 from polisprojekt.model.event_model import Event
+from datetime import datetime
 
 
 def get_serious_events(
@@ -12,8 +13,8 @@ def get_serious_events(
     (senaste först). Events utan parsebar tid ignoreras.
     """
     serious = [
-        e for e in events
-        if e.time is not None and e.seriousness >= min_score
+    e for e in events
+    if e.seriousness >= min_score
     ]
-    serious.sort(key=lambda e: e.time, reverse=True)
+    serious.sort(key=lambda e: e.time or datetime.min, reverse=True)
     return serious
