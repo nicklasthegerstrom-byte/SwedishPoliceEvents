@@ -134,12 +134,12 @@ class Event:
         return (
             f"{warning}"
             f"🚨 *{self.type}*\n"
-            f"🕒 {time_str}\n"
+            f"🕒 Publicerad: {time_str}\n"
             f"📍 {place}\n"
             f"📝 {self.summary}\n"
             f"{link_part}"
         )
-    
+        
     def to_discord(self) -> str:
         t = self.time
         time_str = t.strftime("%Y-%m-%d %H:%M") if t else "Okänd tid"
@@ -169,7 +169,7 @@ class Event:
         return (
             f"{warning}"
             f"🚨 **{self.type}**\n"
-            f"🕒 {time_str}\n"
+            f"🕒 Publicerad: {time_str}\n"
             f"📍 {place}\n"
             f"📝 {self.summary}"
             f"{link_part}"
