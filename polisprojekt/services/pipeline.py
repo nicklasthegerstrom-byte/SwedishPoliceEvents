@@ -16,8 +16,9 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 6) -> dict[str,
     1) Hämtar events från API
     2) Sparar alla i DB (historik)
     3) Filtrerar ut "serious"
-    4) Skickar till Discord via notify_discord (dedupe + mark_notified ingår där)
-    Returnerar enkel statistik.
+    4) Bootstrap-skydd: om massor av nya events (första körning) -> skicka inget,
+       men markera serious som notifierade så framtida varv bara skickar nya.
+    5) Annars: skicka till Discord via notify_discord (dedupe + mark_notified ingår där)
     """
     api_data = fetch_events()
     if not api_data:
@@ -33,6 +34,26 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 6) -> dict[str,
 
     serious = get_serious_events(events, min_score=min_score)
     serious = sorted(serious, key=lambda e: e.time or datetime.min)
+
+    # --- Bootstrap-skydd (anti-spam vid första sync) ---
+    BOOTSTRAP_INSERTED_THRESHOLD = 100  # justera vid behov
+
+    if inserted >= BOOTSTRAP_INSERTED_THRESHOLD:
+        logger.info(
+            "Bootstrap-läge: %s nya events. Skickar inga notiser, markerar serious som notifierade.",
+            inserted,
+        )
+        for e in serious:
+            if e.event_id is not None:
+                db.mark_notified(e.event_id)
+
+        return {
+            "fetched": len(events),
+            "inserted": inserted,
+            "serious": len(serious),
+            "sent": 0,
+        }
+    # -----------------------------------------------
 
     sent = notify_discord(
         db=db,
