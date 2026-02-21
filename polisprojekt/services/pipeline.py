@@ -1,5 +1,5 @@
 from __future__ import annotations
-from polisprojekt.services.notify import notify_discord
+from polisprojekt.services.notify import notify_discord, notify_slack
 from polisprojekt.data.api_fetch import fetch_events
 from polisprojekt.model.event_model import Event
 from polisprojekt.services.database import EventDB
@@ -11,15 +11,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def run_once_discord(db: EventDB, webhook: str, min_score: int = 6) -> dict[str, int]:
-    """
-    1) Hämtar events från API
-    2) Sparar alla i DB (historik)
-    3) Filtrerar ut "serious"
-    4) Bootstrap-skydd: om massor av nya events (första körning) -> skicka inget,
-       men markera serious som notifierade så framtida varv bara skickar nya.
-    5) Annars: skicka till Discord via notify_discord (dedupe + mark_notified ingår där)
-    """
+def run_once_slack(db: EventDB, webhook: str, min_score: int = 6) -> dict[str, int]:
+  
     api_data = fetch_events()
     if not api_data:
         logger.warning("API levererade ingen data.")
@@ -55,7 +48,7 @@ def run_once_discord(db: EventDB, webhook: str, min_score: int = 6) -> dict[str,
         }
     # -----------------------------------------------
 
-    sent = notify_discord(
+    sent = notify_slack(
         db=db,
         events=serious,
         webhook_url=webhook,

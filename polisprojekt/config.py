@@ -11,6 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 
 DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TZ = ZoneInfo("Europe/Stockholm")

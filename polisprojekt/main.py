@@ -5,9 +5,9 @@ load_dotenv()
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from polisprojekt.config import DISCORD_WEBHOOK, active_events_db_path
+from polisprojekt.config import DISCORD_WEBHOOK, active_events_db_path, SLACK_WEBHOOK
 from polisprojekt.services.database import EventDB
-from polisprojekt.services.pipeline import run_once_discord
+from polisprojekt.services.pipeline import run_once_slack
 from polisprojekt.services.logger import setup_logger
 
 logger = setup_logger()
@@ -17,8 +17,8 @@ TZ = ZoneInfo("Europe/Stockholm")
 
 
 def main() -> None:
-    if not DISCORD_WEBHOOK:
-        raise ValueError("DISCORD_WEBHOOK saknas i .env")
+    if not SLACK_WEBHOOK:
+        raise ValueError("SLACK_WEBHOOK saknas i .env")
 
     db = EventDB(str(active_events_db_path()))
     logger.info(f"DB: {active_events_db_path()}")
@@ -29,7 +29,7 @@ def main() -> None:
             logger.info(f"Loop start {now}")
 
             try:
-                stats = run_once_discord(db, DISCORD_WEBHOOK)
+                stats = run_once_slack(db, SLACK_WEBHOOK)
 
                 # terminal (valfritt)
                 print(f"\n[{now}] {stats}")
