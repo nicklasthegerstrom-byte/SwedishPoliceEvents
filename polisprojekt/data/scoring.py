@@ -61,6 +61,7 @@ SERIOUSNESS = {
     "Rån övrigt": 4,
     "Rån, försök": 4,
     "Räddningsinsats": 8,
+    "Sabotage mot blåljusverksamhet": 4,
     "Sammanfattning dag": 0,
     "Sammanfattning dygn": 0,
     "Sammanfattning eftermiddag": 0,
