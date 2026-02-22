@@ -129,7 +129,7 @@ class Event:
             place = "Okänd plats"
 
         url = self.full_url
-        link_part = f"🔗 <{url}|Läs mer>" if url else ""
+    
 
         return (
             f"{warning}"
@@ -137,7 +137,7 @@ class Event:
             f"🕒 Publicerad: {time_str}\n"
             f"📍 {place}\n"
             f"📝 {self.summary}\n"
-            f"{link_part}"
+            f"{'\n\n' + url if url else ''}"
         )
         
     def to_discord(self) -> str:
