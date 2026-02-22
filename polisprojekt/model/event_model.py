@@ -130,7 +130,9 @@ class Event:
 
         title = self.name
         url = self.full_url
-        title_part = f"🔗 Källa: Polisen.se / <{url}|{title}>" if url else f"Källa: Wwww.polisen.se / 💻 {title}"
+        title_part = f"🔗 Källa: Polisen.se / <{url}|{title}>" if url else f"Källa: www.polisen.se / 💻 {title}"
+
+        SEPARATOR = "— — — — — — — — — —"
 
         return (
             f"{warning}"
@@ -139,6 +141,7 @@ class Event:
             f"📍 {place}\n"
             f"📝 {self.summary}\n\n"
             f"{title_part}"
+            f"{SEPARATOR}"
         )
         
     def to_discord(self) -> str:
