@@ -128,16 +128,17 @@ class Event:
             logger.warning(f"Ingen plats angiven.")
             place = "Okänd plats"
 
+        title = self.name
         url = self.full_url
-        link_part = f"🔗 <{url}|Läs mer>" if url else ""
+        title_part = f"🔗 Källa: <{url}|{title}>" if url else f"Källa: Wwww.polisen.se / 💻 {title}"
 
         return (
             f"{warning}"
             f"🚨 *{self.type}*\n"
             f"🕒 Publicerad: {time_str}\n"
             f"📍 {place}\n"
-            f"📝 {self.summary}\n"
-            f"{link_part}"
+            f"📝 {self.summary}\n\n"
+            f"{title_part}"
         )
         
     def to_discord(self) -> str:
