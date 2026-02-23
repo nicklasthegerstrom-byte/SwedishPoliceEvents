@@ -44,7 +44,7 @@ def main() -> None:
                 # terminal (valfritt)
                 print(f"\n[{now}] ERROR i loop (se logg för traceback)")
 
-            time.sleep(30)
+            time.sleep(60)
 
     except KeyboardInterrupt:
         logger.info("Stänger ner polisprojekt (KeyboardInterrupt)")
