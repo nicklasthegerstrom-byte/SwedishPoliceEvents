@@ -140,8 +140,8 @@ class Event:
             f"🕒 Publicerad: {time_str}\n"
             f"📍 {place}\n"
             f"📝 {self.summary}\n\n"
-            f"{title_part}"
-            f"{SEPARATOR}"
+            f"{title_part}\n"
+            f"{SEPARATOR}\n"
         )
         
     def to_discord(self) -> str:
