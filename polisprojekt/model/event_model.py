@@ -132,7 +132,7 @@ class Event:
         url = self.full_url
         title_part = f"🔗 Källa: Polisen.se / <{url}|{title}>" if url else f"Källa: www.polisen.se / 💻 {title}"
 
-        SEPARATOR = "— — — — — — — — — —"
+        SEPARATOR = "——————————————————————————————"
 
         return (
             f"{warning}"
