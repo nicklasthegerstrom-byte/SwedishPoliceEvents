@@ -76,6 +76,7 @@ SERIOUSNESS = {
     "Sammanfattning natt": 0,
     "Sammanfattning vecka": 0,
     "Sedlighetsbrott": 1,
+    "Sexualbrott": 5,
     "Sjukdom/olycksfall": 1,
     "Sjölagen": 2,
     "Skadegörelse": 1,
