@@ -28,6 +28,7 @@ BORING_MOUNTAIN_KEYWORDS = [
 SERIOUS_MOUNTAIN_KEYWORDS = [
     "lavin",
     "allvarligt skadad"
+    "svårt skadad"
     "försvunnen",
     "saknad",
     "nedkyld",
