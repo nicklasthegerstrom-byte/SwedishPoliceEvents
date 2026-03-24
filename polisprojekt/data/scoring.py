@@ -80,6 +80,7 @@ SERIOUSNESS = {
     "Sjukdom/olycksfall": 1,
     "Sjölagen": 2,
     "Skadegörelse": 1,
+    "Skyddslagen": 3,
     "Skottlossning": 10,
     "Skottlossning, misstänkt": 10,
     "Spridning smittsamma kemikalier": 5,
