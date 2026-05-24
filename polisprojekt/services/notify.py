@@ -42,6 +42,41 @@ def notify_slack(
 
     return sent_count
 
+def notify_slack_updates(
+    db: EventDB,
+    events: list[Event],
+    webhook_url: str,
+    min_score: int = 7,
+) -> int:
+    """
+    Skickar Slack-uppdateringar för events som:
+    - har seriousness >= min_score
+    - redan har notifierats tidigare
+    Markerar inte om notified igen, eftersom eventet redan är känt.
+    Returnerar antal skickade uppdateringar.
+    """
+    sent_count = 0
+
+    for e in events:
+        if e.event_id is None:
+            continue
+
+        if e.seriousness < min_score:
+            continue
+
+        if not db.is_notified(e.event_id):
+            continue
+
+        ok = send_to_slack(webhook_url, e.to_slack_update())
+
+        if ok:
+            logger.info(f"Skickade uppdatering för event {e.event_id} ({e.type})")
+            sent_count += 1
+        else:
+            logger.error(f"Misslyckades skicka uppdatering för event {e.event_id} ({e.type})")
+
+    return sent_count
+
 def notify_discord(
     db: EventDB,
     events: list[Event],

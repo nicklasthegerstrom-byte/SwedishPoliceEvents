@@ -50,9 +50,10 @@ class EventDB:
 
             con.commit()
 
-    def save_event(self, e: Event) -> bool:
+    def save_event(self, e: Event) -> str:
+        
         if e.event_id is None:
-            return False
+            return "unchanged"
 
         fetched_at = datetime.now(timezone.utc).isoformat()
 
@@ -62,27 +63,68 @@ class EventDB:
             gps = loc.get("gps")
 
         raw_json = json.dumps(e.raw, ensure_ascii=False)
+        new_summary = (e.summary or "").strip()
 
         with self._connect() as con:
-            cur = con.execute("""
-                INSERT OR IGNORE INTO events
-                (event_id, datetime, type, summary, name, city, county, gps, url, fetched_at, raw_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                e.event_id,
-                e.datetime_str,
-                e.type,
-                e.summary,
-                e.name,
-                e.city,
-                e.county,
-                gps,
-                e.url,
-                fetched_at,
-                raw_json,
-            ))
-            con.commit()
-            return cur.rowcount == 1
+            existing = con.execute(
+                "SELECT summary FROM events WHERE event_id = ?",
+                (e.event_id,),
+            ).fetchone()
+
+            if existing is None:
+                con.execute("""
+                    INSERT INTO events
+                    (event_id, datetime, type, summary, name, city, county, gps, url, fetched_at, raw_json)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    e.event_id,
+                    e.datetime_str,
+                    e.type,
+                    new_summary,
+                    e.name,
+                    e.city,
+                    e.county,
+                    gps,
+                    e.url,
+                    fetched_at,
+                    raw_json,
+                ))
+                con.commit()
+                return "inserted"
+
+            old_summary = (existing["summary"] or "").strip()
+
+            if old_summary != new_summary:
+                con.execute("""
+                    UPDATE events
+                    SET datetime = ?,
+                        type = ?,
+                        summary = ?,
+                        name = ?,
+                        city = ?,
+                        county = ?,
+                        gps = ?,
+                        url = ?,
+                        fetched_at = ?,
+                        raw_json = ?
+                    WHERE event_id = ?
+                """, (
+                    e.datetime_str,
+                    e.type,
+                    new_summary,
+                    e.name,
+                    e.city,
+                    e.county,
+                    gps,
+                    e.url,
+                    fetched_at,
+                    raw_json,
+                    e.event_id,
+                ))
+                con.commit()
+                return "updated"
+
+            return "unchanged"
         
     def is_notified(self, event_id: int) -> bool:
         """True om event_id redan finns i notified-tabellen."""
@@ -110,22 +152,5 @@ class EventDB:
             )
             con.commit()   
 
-        #OBS JAG BEHÖVER INTE DENNA JUST NU TA BORT SEN
-    def mark_notified_if_new(self, event_id: int) -> bool:
-        """
-        Markera att vi notifierat eventet.
-        Returnerar True om det var första gången (dvs posta till Slack),
-        annars False.
-        """
-        now = datetime.now(timezone.utc).isoformat()
-
-        with self._connect() as con:
-            cur = con.execute(
-                "INSERT OR IGNORE INTO notified (event_id, notified_at) VALUES (?, ?)",
-                (event_id, now),
-            )
-            con.commit()
-            return cur.rowcount == 1
-        
     
         

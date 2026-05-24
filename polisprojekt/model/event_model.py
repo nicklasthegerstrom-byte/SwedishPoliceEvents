@@ -143,7 +143,40 @@ class Event:
             f"{title_part}\n"
             f"{SEPARATOR}\n"
         )
+    
+    def to_slack_update(self) -> str:
         
+        t = self.time
+        time_str = t.strftime("%Y-%m-%d %H:%M") if t else "Okänd tid"
+
+        city = self.city
+        county = self.county
+
+        if city and county and city != county:
+            place = f"{city} ({county})"
+        elif county:
+            place = county
+        elif city:
+            place = city
+        else:
+            logger.warning("Ingen plats angiven.")
+            place = "Okänd plats"
+
+        title = self.name
+        url = self.full_url
+        title_part = f"🔗 Källa: Polisen.se / <{url}|{title}>" if url else f"Källa: www.polisen.se / 💻 {title}"
+
+        SEPARATOR = "——————————————————————————————"
+
+        return (
+            f"🔄 *UPPDATERING: {self.type}*\n"
+            f"🕒 Publicerad: {time_str}\n"
+            f"📍 {place}\n"
+            f"📝 {self.summary}\n\n"
+            f"{title_part}\n"
+            f"{SEPARATOR}\n"
+        )
+
     def to_discord(self) -> str:
         t = self.time
         time_str = t.strftime("%Y-%m-%d %H:%M") if t else "Okänd tid"
