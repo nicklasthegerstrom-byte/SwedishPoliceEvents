@@ -77,12 +77,11 @@ def run_once_slack(db: EventDB, webhook: str, min_score: int = 6) -> dict[str, i
         min_score=min_score,
     )
 
-    # Skicka uppdateringar
-    update_sent = notify_slack_updates(
-        db=db,
-        events=updated_serious,
-        webhook_url=webhook,
-        min_score=min_score,
+    update_sent = 0
+    logger.warning(
+        "Update-notiser AVSTÄNGDA temporärt. updated=%s updated_serious=%s",
+        updated,
+        len(updated_serious),
     )
 
     return {
